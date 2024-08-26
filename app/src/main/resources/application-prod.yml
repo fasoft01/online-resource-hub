@@ -1,0 +1,57 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: epayments-user-management-service
+  #  datasource:
+  #    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  #    url: jdbc:sqlserver://52.4.172.195;instance=;DatabaseName=EpayDatabase;trustServerCertificate=true;
+  #    username: sa
+  #    password: "%$Afro123"
+  #  jpa:
+  #    hibernate:
+  #      ddl-auto: update
+  #    show-sql: false
+
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://44.196.149.62:8080/realms/InstalipaGateway
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+
+
+keycloak:
+  token-uri: http://44.196.149.62:8080/realms/InstalipaGateway/protocol/openid-connect/token
+  grant-type: password
+  client-id: InstalipaGateway
+  admin-client-id: admin-cli
+  admin-username: admin
+  admin-password: admin
+  realm-base-url: http://44.196.149.62:8080/admin/realms/InstalipaGateway
+  masterUrl: http://44.196.149.62:8080/realms/master/protocol/openid-connect/token
+  client-user-uri: http://44.196.149.62:8080/admin/realms/InstalipaGateway/users
+  client-uuid: 60cbfeb0-14a7-484c-863d-45ab7c370aee
+
+
+notifications:
+  service-url: http://44.196.149.62:8082/notifications/send-notifications
+  jwt:
+    auth:
+      converter:
+        resource-id: InstalipaGateway
+        principal-attribute: preferred_username
+#eureka:
+#  instance:
+#    prefer-ip-address: true
+#  client:
+#    registerWithEureka: true
+#    fetchRegistry: true
+#    serviceUrl:
+#      defaultZone: http://44.196.149.62:8445/eureka/
