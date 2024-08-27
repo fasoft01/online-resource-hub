@@ -47,7 +47,7 @@ public class ResourceServiceImpl implements ResourceService {
                             .keywords(documentRequest.getKeywords())
                             .status(ResourceStatus.AWAITING_APPROVAL)
                             .contributorDetails(contributorDetails)
-                            .userAccount(userAccount)
+//                            .userAccount(userAccount)
                             .resourceCategory(documentRequest.getResourceCategory())
                             .uri(documentRequest.getUri())
                             .build();
@@ -86,7 +86,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     private boolean documentExists(ResourceRequest documentRequest) {
-        if(resourceRepository.existsByName(documentRequest.getTitle())) {
+        if(resourceRepository.existsByTitle(documentRequest.getTitle())) {
             return true;
         }
         return false;
@@ -167,10 +167,10 @@ public class ResourceServiceImpl implements ResourceService {
         String subject = "Submission Received: Your Academic Resource has been Approved";
         notificationService.sendNotification(Message.CONTRIBUTION_APPROVED_MESSAGE
                         .replace("{resourceTitle}", resource.getTitle()),
-                subject, resource.getContributorDetails().getName(),
-                resource.getUserAccount(), false, false, false);
+                subject, resource.getContributorDetails().getName(),null, false, false, false);
+//                resource.getUserAccount(), false, false, false);
 
-        notifyEveryone(resource);
+//        notifyEveryone(resource);
 
         return resource;
     }
@@ -203,7 +203,7 @@ public class ResourceServiceImpl implements ResourceService {
                          .replace("{resourceTitle}", resource.getTitle())
                          .replace("{reason}", reason),
                  subject, resource.getContributorDetails().getName(),
-                 resource.getUserAccount(), false, false, false);
+                 null, false, false, false);
          return resource;
     }
 

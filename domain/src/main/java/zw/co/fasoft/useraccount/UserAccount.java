@@ -33,8 +33,8 @@ public class UserAccount extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
     @Enumerated(EnumType.STRING)
-    private UserGroup role;
+    private UserGroup userGroup;
     @JsonIgnore
-    @OneToMany
-    private List<Resource> roles = new ArrayList<>();
+    @OneToMany(mappedBy = "userAccount", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Resource> resources = new ArrayList<>();
 }

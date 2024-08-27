@@ -12,11 +12,12 @@ import zw.co.fasoft.utils.enums.ResourceStatus;
  * @author Fasoft
  * @date 30/May/2024
  */
-@Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@Table(name = "resources")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class Resource extends BaseEntity {
     @Id
@@ -33,5 +34,6 @@ public class Resource extends BaseEntity {
     private ResourceStatus status;
     private String uri;
     @ManyToOne
+    @JoinColumn(name = "user_account_id")
     private UserAccount userAccount;
 }

@@ -2,7 +2,10 @@ package zw.co.fasoft.administration;
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import lombok.Builder;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
@@ -10,6 +13,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 import zw.co.fasoft.CommonsService;
 import zw.co.fasoft.NotificationServiceImpl;
 import zw.co.fasoft.auth.KeycloakCommons;
@@ -34,12 +38,36 @@ public class AdministrationServiceImpl implements AdministrationService{
     private final CommonsService commonsService;
     private final KeycloakCommons keycloakCommons;
     private final NotificationServiceImpl notificationService;
+    private final RestTemplate restTemplate;
+
+    @Value("${api-urls.auth-service}")
+    private String authServiceUrl;
     @Override
     public UserAccount createUser(UserAccountRequest userAccountRequest) {
         var userAccount = commonsService.saveUser(userAccountRequest);
+
+        PostUserAccountRequest postUserAccountRequest = PostUserAccountRequest.builder()
+                .fullName(userAccount.getFullName())
+                .email(userAccount.getEmail())
+                .phoneNumber(userAccount.getPhoneNumber())
+                .role(userAccount.getUserGroup())
+                .build();
+        saveKeycloakUser(postUserAccountRequest);
         commonsService.sendNotification(userAccount, userAccount.getFullName());
         return userAccount;
     }
+
+    private void saveKeycloakUser(PostUserAccountRequest postUserAccountRequest) {
+        String url = authServiceUrl+"/v1/auth";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<PostUserAccountRequest> request = new HttpEntity<>(postUserAccountRequest, headers);
+
+        ResponseEntity<PostUserAccountRequest> response = restTemplate.postForEntity(url, request, PostUserAccountRequest.class);
+    }
+
 
     @Override
     public UserAccount updateUserProfile(String username,UpdateUserAccountRequest userAccountRequest) {
@@ -117,7 +145,16 @@ public class AdministrationServiceImpl implements AdministrationService{
                 .email(userAccount.getEmail())
                 .phoneNumber(userAccount.getPhoneNumber())
                 .status(userAccount.getStatus())
-                .role(userAccount.getRole())
+                .role(userAccount.getUserGroup())
                 .build();
     }
+}
+@Builder
+@Data
+  class PostUserAccountRequest {
+    private String fullName;
+    private String email;
+    private String phoneNumber;
+    @Enumerated(EnumType.STRING)
+    private UserGroup role;
 }

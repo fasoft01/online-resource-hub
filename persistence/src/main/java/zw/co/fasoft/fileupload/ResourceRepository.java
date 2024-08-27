@@ -18,5 +18,5 @@ public interface ResourceRepository extends BaseRepository<Resource, Long> {
     List<Resource> findAllByKeywordsContainingIgnoreCase(String keywords);
     List<Resource> findAllByDescriptionContainingIgnoreCase(String description);
     List<Resource> findAllByResourceCategory(ResourceCategory resourceCategory);
-    boolean existsByName(String name);
+    boolean existsByTitle(String name);
 }

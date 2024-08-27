@@ -2,17 +2,17 @@ server:
   port: 8085
 
 spring:
-  application:
-    name: epayments-user-management-service
-  #  datasource:
-  #    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-  #    url: jdbc:sqlserver://52.4.172.195;instance=;DatabaseName=EpayDatabase;trustServerCertificate=true;
-  #    username: sa
-  #    password: "%$Afro123"
-  #  jpa:
-  #    hibernate:
-  #      ddl-auto: update
-  #    show-sql: false
+  datasource:
+    url: jdbc:sqlserver://192.168.10.187;databaseName=student;trustServerCertificate=true;
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    username: sa
+    password: "%$Afro123"
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+
 
   servlet:
     multipart:
@@ -47,6 +47,8 @@ notifications:
       converter:
         resource-id: InstalipaGateway
         principal-attribute: preferred_username
+api-urls:
+  frontend-login-link: http://44.196.149.62:4200
 #eureka:
 #  instance:
 #    prefer-ip-address: true

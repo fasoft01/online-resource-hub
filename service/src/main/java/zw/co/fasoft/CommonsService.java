@@ -33,7 +33,7 @@ public class CommonsService {
                 .email(userAccountRequest.getEmail())
                 .phoneNumber(userAccountRequest.getPhoneNumber())
                 .status(Status.ACTIVATED)
-                .role(userAccountRequest.getRole())
+                .userGroup(userAccountRequest.getRole())
                 .build();
         return userAccountRepository.save(userAccount);
     }
@@ -45,7 +45,7 @@ public class CommonsService {
                 .content(Message.USER_ACCOUNT_CREATION_MESSAGE
                         .replace("{username}", userAccount.getUsername())
                         .replace("{password}", Unique_Credentials_Generation.generateRandomPassword(7))
-                        .replace("{role}", userAccount.getRole().name())
+                        .replace("{role}", userAccount.getUserGroup().name())
                         .replace("{login-message}",Message.ADMIN_LOGIN_LINK_MESSAGE.
                                 replace("{admin-login-link}",loginLink))
                 )
