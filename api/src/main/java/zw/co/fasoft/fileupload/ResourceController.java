@@ -1,13 +1,16 @@
 package zw.co.fasoft.fileupload;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -17,8 +20,9 @@ import java.util.List;
  * @date 30/May/2024
  */
 @RestController
-@RequestMapping("/resources")
+@RequestMapping(value = "/resources",produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Files & Resources", description = "files and resources")
+@SecurityRequirement(name = "authorization")
 public class ResourceController {
     private final ResourceService resourceService;
     @Autowired
@@ -28,6 +32,7 @@ public class ResourceController {
 
     @PostMapping()
     @Operation(description = "Save Resource")
+    @PreAuthorize("hasRole('ADMIN')")
     private ResponseEntity<List<Resource>> create(
             @RequestBody List<ResourceRequest> request,
             @RequestParam String username
@@ -36,6 +41,7 @@ public class ResourceController {
     }
 
     @PutMapping("/approve/{resource-id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(description = "Approve Resource")
     private ResponseEntity<Resource> approve(
             @PathVariable("resource-id") Long resourceId
@@ -44,6 +50,7 @@ public class ResourceController {
     }
 
     @PutMapping("/reject/{resource-id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(description = "Reject Resource")
     private ResponseEntity<Resource> reject(
             @PathVariable("resource-id") Long resourceId,
@@ -56,9 +63,9 @@ public class ResourceController {
     @Operation(description = "getting all resources created by logged in user")
     public ResponseEntity<List<Resource>> getAllResources(
             Principal principal,
-            @RequestParam(value = "category", required = false) ResourceCategory category
+            @RequestParam(value = "category", required = false) Long categoryId
             ) {
-        return ResponseEntity.ok(resourceService.getProfileResources(principal.getName(),category));
+        return ResponseEntity.ok(resourceService.getProfileResources(principal.getName(),categoryId));
     }
     @GetMapping("{id}")
     @Operation(description = "getting document by it's id number")
@@ -67,16 +74,18 @@ public class ResourceController {
     }
 
     @DeleteMapping("{id}")
+    @Operation(description = "deleting document by it's id number")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         resourceService.delete(id);
         return ResponseEntity.ok().body("Resource Deleted Successfully");
     }
 
-    @GetMapping
+    @GetMapping("/search")
     public ResponseEntity<List<Resource>> searchForResources
             (
                     @Nullable @RequestParam(required = true) String searchParam,
-                    @Nullable @RequestParam(required = false)ResourceCategory category,
+                    @Nullable @RequestParam(required = false)Long categoryId,
                     @RequestParam(required = false, defaultValue = "0") int pageNumber,
                     @RequestParam(required = false, defaultValue = "10") int pageSize,
                     @RequestParam(value = "sortBy", defaultValue = "createdOn") String sortBy,
@@ -84,17 +93,17 @@ public class ResourceController {
             ){
         Sort.Direction direction = sortDir.equalsIgnoreCase(sortBy) ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortBy));
-        return ResponseEntity.ok(resourceService.searchForResources(searchParam,category,pageable));
+        return ResponseEntity.ok(resourceService.searchForResources(searchParam,categoryId,pageable));
     }
 
-    @GetMapping("filtered")
+    @GetMapping
     public ResponseEntity<List<Resource>> getAllResources
             (
                     @Nullable @RequestParam(required = false) String title,
                     @Nullable @RequestParam(required = false) String description,
                     @Nullable @RequestParam(required = false) String keywords,
                     @Nullable @RequestParam(required = false) String contributorName,
-                    @Nullable @RequestParam(required = false)ResourceCategory category,
+                    @Nullable @RequestParam(required = false)Long categoryId,
                     @RequestParam(required = false, defaultValue = "0") int pageNumber,
                     @RequestParam(required = false, defaultValue = "10") int pageSize,
                     @RequestParam(value = "sortBy", defaultValue = "createdOn") String sortBy,
@@ -102,7 +111,7 @@ public class ResourceController {
             ){
         Sort.Direction direction = sortDir.equalsIgnoreCase(sortBy) ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortBy));
-        return ResponseEntity.ok(resourceService.getAllResources(contributorName,title,description,keywords,category,pageable));
+        return ResponseEntity.ok(resourceService.getAllResources(contributorName,title,description,keywords,categoryId,pageable));
     }
 
 }

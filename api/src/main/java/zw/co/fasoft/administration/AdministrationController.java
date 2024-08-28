@@ -1,6 +1,7 @@
 package zw.co.fasoft.administration;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import lombok.Data;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import zw.co.fasoft.requests.UserAccountRequest;
@@ -29,8 +31,9 @@ import java.security.Principal;
 @Data
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/admin")
+@RequestMapping(value = "/admin", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Administration Controller", description = "Controller for performing administrative duties")
+@SecurityRequirement(name = "authorization")
 public class AdministrationController {
 
     private final AdministrationService administrationService;
@@ -45,12 +48,14 @@ public class AdministrationController {
 
     @PutMapping("/user")
     @Operation(description = "User update Profile")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserAccount> updateUserAccount(
             Principal principal,
             @RequestBody UpdateUserAccountRequest request){
         return ResponseEntity.ok(administrationService.updateUserProfile(principal.getName(),request));
     }
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(description = "Deletes User by ID")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         administrationService.deleteUser(id);

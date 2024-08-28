@@ -21,7 +21,6 @@ public class ResourceRequest {
     @Embedded
     private ContributorDetails contributorDetails;
     private String keywords;
-    private ResourceCategory resourceCategory;
     private String uri;
     private Set<Long> resourceCategoryIds;
 }

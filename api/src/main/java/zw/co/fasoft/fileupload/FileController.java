@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/documents")
+@RequestMapping(value = "/documents", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Files & Resources", description = "files and documents")
 public class FileController {
 

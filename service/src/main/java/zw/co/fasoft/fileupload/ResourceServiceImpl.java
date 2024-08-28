@@ -51,18 +51,22 @@ public class ResourceServiceImpl implements ResourceService {
                             .uri(documentRequest.getUri())
                             .build();
                         documents.add(document);
-
-                        String subject = "Submission Received: Your Academic Resource is Awaiting Approval";
-                        notificationService.sendNotification(Message.CONTRIBUTION_SUBMITTED_MESSAGE
-                                .replace("{resourceTitle}", documentRequest.getTitle()),
-                                subject, documentRequest.getContributorDetails().getName(),
-                                userAccount, false, false, false);
+                        sendNotification(documentRequest, userAccount);
                 });
         List<Resource> savedResources = resourceRepository.saveAllAndFlush(documents);
         if (!savedResources.isEmpty()) {
             notifyAdmin(savedResources.size());
         }
         return savedResources;
+    }
+
+    @Async
+    public void sendNotification(ResourceRequest request,UserAccount userAccount){
+        String subject = "Submission Received: Your Academic Resource is Awaiting Approval";
+        notificationService.sendNotification(Message.CONTRIBUTION_SUBMITTED_MESSAGE
+                        .replace("{resourceTitle}", request.getTitle()),
+                subject, request.getContributorDetails().getName(),
+                userAccount, true, false, false);
     }
 
     @Async
@@ -106,7 +110,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 
     @Override
-    public List<Resource> searchForResources(String searchParam, ResourceCategory category, Pageable pageable) {
+    public List<Resource> searchForResources(String searchParam, Long categoryId, Pageable pageable) {
         if(!resourceRepository.findAllByTitleContainingIgnoreCase(searchParam).isEmpty()) {
             return resourceRepository.findAllByTitleContainingIgnoreCase(searchParam);
         }
@@ -116,9 +120,9 @@ public class ResourceServiceImpl implements ResourceService {
         if(!resourceRepository.findAllByKeywordsContainingIgnoreCase(searchParam).isEmpty()) {
             return resourceRepository.findAllByKeywordsContainingIgnoreCase(searchParam);
         }
-        if(!resourceRepository.findAllByContributorDetails_NameContainingIgnoreCaseOrderByCreatedOnDesc(searchParam).isEmpty()) {
-            return resourceRepository.findAllByResourceCategory(category);
-        }
+//        if(!resourceRepository.findAllByContributorDetails_NameContainingIgnoreCaseOrderByCreatedOnDesc(searchParam).isEmpty()) {
+//            return resourceRepository.findAllByResourceCategory(categoryId);
+//        }
         return new ArrayList<>();
     }
 
@@ -136,7 +140,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public List<Resource> getAllResources(String contributorName, String title, String description, String keywords, ResourceCategory category, Pageable pageable) {
+    public List<Resource> getAllResources(String contributorName, String title, String description, String keywords, Long categoryId, Pageable pageable) {
         if(Objects.nonNull(title)) {
             return resourceRepository.findAllByTitleContainingIgnoreCase(title);
         }
@@ -146,9 +150,9 @@ public class ResourceServiceImpl implements ResourceService {
         if(Objects.nonNull(keywords)) {
             return resourceRepository.findAllByKeywordsContainingIgnoreCase(keywords);
         }
-        if(Objects.nonNull(category)) {
-            return resourceRepository.findAllByResourceCategory(category);
-        }
+//        if(Objects.nonNull(category)) {
+//            return resourceRepository.findAllByResourceCategory(category);
+//        }
         if(Objects.nonNull(contributorName)) {
             return resourceRepository.findAllByContributorDetails_NameContainingIgnoreCaseOrderByCreatedOnDesc(contributorName);
         }
@@ -167,7 +171,7 @@ public class ResourceServiceImpl implements ResourceService {
         notificationService.sendNotification(Message.CONTRIBUTION_APPROVED_MESSAGE
                         .replace("{resourceTitle}", resource.getTitle()),
                 subject, resource.getContributorDetails().getName(),
-                resource.getUserAccount(), false, false, false);
+                resource.getUserAccount(), true, false, false);
 
         notifyEveryone(resource);
 
@@ -185,7 +189,7 @@ public class ResourceServiceImpl implements ResourceService {
                     .replace("{resource-link}", resource.getUri())
                     .replace("{contributor-name}", resource.getKeywords()),
                     subject, resource.getContributorDetails().getName(),
-                    userAccount, false, false, false);
+                    userAccount, true, false, false);
         });
     }
 
@@ -202,15 +206,15 @@ public class ResourceServiceImpl implements ResourceService {
                          .replace("{resourceTitle}", resource.getTitle())
                          .replace("{reason}", reason),
                  subject, resource.getContributorDetails().getName(),
-                 resource.getUserAccount(), false, false, false);
+                 resource.getUserAccount(), true, false, false);
          return resource;
     }
 
     @Override
-    public List<Resource> getProfileResources(String username, ResourceCategory category) {
-        if(Objects.nonNull(category)) {
-            return resourceRepository.findAllByUserAccount_UsernameAndResourceCategoryOrderByCreatedOnDesc(username,category);
-        }
+    public List<Resource> getProfileResources(String username, Long categoryId) {
+//        if(Objects.nonNull(categoryId)) {
+//            return resourceRepository.findAllByUserAccount_UsernameAndResourceCategoryOrderByCreatedOnDesc(username,categoryId);
+//        }
         return resourceRepository.findAllByUserAccount_UsernameOrderByCreatedOnDesc(username);
     }
 }

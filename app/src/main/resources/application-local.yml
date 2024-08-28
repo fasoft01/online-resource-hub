@@ -23,20 +23,20 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:7080/realms/InstalipaGateway
+          issuer-uri: http://localhost:7080/realms/OnlineResourceHub
           jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
 
 
 keycloak:
-  token-uri: http://44.196.149.62:8080/realms/InstalipaGateway/protocol/openid-connect/token
+  token-uri: http://localhost:7080/realms/OnlineResourceHub/protocol/openid-connect/token
   grant-type: password
-  client-id: InstalipaGateway
+  client-id: OnlineResourceHub
   admin-client-id: admin-cli
   admin-username: admin
   admin-password: admin
-  realm-base-url: http://44.196.149.62:8080/admin/realms/InstalipaGateway
+  realm-base-url: http://localhost:7080/realms/OnlineResourceHub
   masterUrl: http://44.196.149.62:8080/realms/master/protocol/openid-connect/token
-  client-user-uri: http://44.196.149.62:8080/admin/realms/InstalipaGateway/users
+  client-user-uri: http://localhost:7080/realms/OnlineResourceHub/users
   client-uuid: 60cbfeb0-14a7-484c-863d-45ab7c370aee
 
 
@@ -45,7 +45,7 @@ notifications:
   jwt:
     auth:
       converter:
-        resource-id: InstalipaGateway
+        resource-id: OnlineResourceHub
         principal-attribute: preferred_username
 api-urls:
   frontend-login-link: http://44.196.149.62:4200

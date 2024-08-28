@@ -10,16 +10,16 @@ public interface ResourceService {
 
     Resource update(Long id, ResourceRequest request);
 
-    List<Resource> searchForResources(String searchParam, ResourceCategory category, Pageable pageable);
+    List<Resource> searchForResources(String searchParam, Long categoryId, Pageable pageable);
 
     Resource getById(Long id);
     void delete(Long id);
 
-    List<Resource> getAllResources(String contributorName, String title, String description, String keywords, ResourceCategory category, Pageable pageable);
+    List<Resource> getAllResources(String contributorName, String title, String description, String keywords, Long categoryId, Pageable pageable);
 
     Resource approve(Long resourceId);
 
     Resource reject(Long resourceId, String reason);
 
-    List<Resource> getProfileResources(String username, ResourceCategory category);
+    List<Resource> getProfileResources(String username, Long categoryId);
 }
