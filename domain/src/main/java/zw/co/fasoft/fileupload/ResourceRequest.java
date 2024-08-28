@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import zw.co.fasoft.embeddables.ContributorDetails;
 
+import java.util.Set;
+
 /**
  * @author Fasoft
  * @date 30/May/2024
@@ -21,4 +23,5 @@ public class ResourceRequest {
     private String keywords;
     private ResourceCategory resourceCategory;
     private String uri;
+    private Set<Long> resourceCategoryIds;
 }

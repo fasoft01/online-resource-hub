@@ -5,9 +5,12 @@ import lombok.*;
 import zw.co.fasoft.base.BaseEntity;
 import zw.co.fasoft.useraccount.UserAccount;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "preferred_resource_categories")
+@Table(name = "resource_categories")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,4 +22,6 @@ public class ResourceCategory extends BaseEntity {
     private String categoryName;
     @ManyToOne
     private UserAccount userAccount;
+    @ManyToMany
+    private List<Resource> resources = new ArrayList<>();
 }

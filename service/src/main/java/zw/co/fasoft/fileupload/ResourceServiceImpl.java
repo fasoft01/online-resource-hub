@@ -47,7 +47,7 @@ public class ResourceServiceImpl implements ResourceService {
                             .status(ResourceStatus.AWAITING_APPROVAL)
                             .contributorDetails(contributorDetails)
                             .userAccount(userAccount)
-                            .resourceCategory(documentRequest.getResourceCategory())
+                            .resourceCategory(null)
                             .uri(documentRequest.getUri())
                             .build();
                         documents.add(document);

@@ -7,6 +7,9 @@ import zw.co.fasoft.embeddables.ContributorDetails;
 import zw.co.fasoft.useraccount.UserAccount;
 import zw.co.fasoft.utils.enums.ResourceStatus;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Fasoft
  * @date 30/May/2024
@@ -24,8 +27,6 @@ public class Resource extends BaseEntity {
     private Long id;
     private String title;
     private String description;
-    @Enumerated(EnumType.STRING)
-    private ResourceCategory resourceCategory;
     @Embedded
     private ContributorDetails contributorDetails;
     private String keywords;
@@ -35,4 +36,6 @@ public class Resource extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_account_id")
     private UserAccount userAccount;
+    @ManyToMany
+    private List<ResourceCategory> resourceCategory = new ArrayList<>();
 }

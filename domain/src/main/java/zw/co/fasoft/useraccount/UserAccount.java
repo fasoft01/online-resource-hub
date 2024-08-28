@@ -34,7 +34,7 @@ public class UserAccount extends BaseEntity {
     private Status status;
     @Enumerated(EnumType.STRING)
     private UserGroup userGroup;
-    @OneToMany
+    @ManyToMany
     @JsonIgnore
     private List<ResourceCategory> preferredCategories = new ArrayList<>();
     @JsonIgnore
