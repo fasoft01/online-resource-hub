@@ -87,7 +87,6 @@ public class AdministrationServiceImpl implements AdministrationService{
                 userAccount.setStatus(Status.DEACTIVATED);
             }
         }
-
         return userAccountRepository.save(userAccount);
     }
     @Async

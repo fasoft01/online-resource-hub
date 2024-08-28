@@ -41,7 +41,7 @@ keycloak:
 
 
 notifications:
-  service-url: http://44.196.149.62:8082/notifications/send-notifications
+  service-url: http://localhost:8082/notifications/send-notification
   jwt:
     auth:
       converter:

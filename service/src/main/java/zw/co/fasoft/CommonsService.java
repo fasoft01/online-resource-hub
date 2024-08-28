@@ -50,7 +50,7 @@ public class CommonsService {
                                 replace("{admin-login-link}",loginLink))
                 )
                 .subject("ONLINE RESOURCE HUB ACCOUNT CREATION")
-                .isSMS(true)
+                .isSMS(false)
                 .recipient(buildRecipient(userAccount,fullName))
                 .isEmail(true)
                 .isPush(false)

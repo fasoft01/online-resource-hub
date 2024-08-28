@@ -12,7 +12,6 @@ import zw.co.fasoft.exceptions.RecordNotFoundException;
 import zw.co.fasoft.useraccount.UserAccount;
 import zw.co.fasoft.useraccount.UserAccountRepository;
 import zw.co.fasoft.utils.Message;
-import zw.co.fasoft.utils.enums.ResourceCategory;
 import zw.co.fasoft.utils.enums.ResourceStatus;
 import zw.co.fasoft.utils.enums.UserGroup;
 
@@ -47,7 +46,7 @@ public class ResourceServiceImpl implements ResourceService {
                             .keywords(documentRequest.getKeywords())
                             .status(ResourceStatus.AWAITING_APPROVAL)
                             .contributorDetails(contributorDetails)
-//                            .userAccount(userAccount)
+                            .userAccount(userAccount)
                             .resourceCategory(documentRequest.getResourceCategory())
                             .uri(documentRequest.getUri())
                             .build();
@@ -167,10 +166,10 @@ public class ResourceServiceImpl implements ResourceService {
         String subject = "Submission Received: Your Academic Resource has been Approved";
         notificationService.sendNotification(Message.CONTRIBUTION_APPROVED_MESSAGE
                         .replace("{resourceTitle}", resource.getTitle()),
-                subject, resource.getContributorDetails().getName(),null, false, false, false);
-//                resource.getUserAccount(), false, false, false);
+                subject, resource.getContributorDetails().getName(),
+                resource.getUserAccount(), false, false, false);
 
-//        notifyEveryone(resource);
+        notifyEveryone(resource);
 
         return resource;
     }
@@ -203,7 +202,7 @@ public class ResourceServiceImpl implements ResourceService {
                          .replace("{resourceTitle}", resource.getTitle())
                          .replace("{reason}", reason),
                  subject, resource.getContributorDetails().getName(),
-                 null, false, false, false);
+                 resource.getUserAccount(), false, false, false);
          return resource;
     }
 

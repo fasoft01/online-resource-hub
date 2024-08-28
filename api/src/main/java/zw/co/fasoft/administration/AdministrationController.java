@@ -50,15 +50,12 @@ public class AdministrationController {
             @RequestBody UpdateUserAccountRequest request){
         return ResponseEntity.ok(administrationService.updateUserProfile(principal.getName(),request));
     }
-
-
     @DeleteMapping("/{id}")
     @Operation(description = "Deletes User by ID")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         administrationService.deleteUser(id);
         return ResponseEntity.ok("User Deleted Successfully");
     }
-
     @GetMapping
     @Operation(description = "Gets All Users")
     public ResponseEntity<Page<UserAccountResponse>> getAll(

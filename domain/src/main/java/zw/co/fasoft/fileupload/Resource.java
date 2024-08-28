@@ -5,7 +5,6 @@ import lombok.*;
 import zw.co.fasoft.base.BaseEntity;
 import zw.co.fasoft.embeddables.ContributorDetails;
 import zw.co.fasoft.useraccount.UserAccount;
-import zw.co.fasoft.utils.enums.ResourceCategory;
 import zw.co.fasoft.utils.enums.ResourceStatus;
 
 /**

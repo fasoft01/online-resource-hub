@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import zw.co.fasoft.base.BaseEntity;
 import zw.co.fasoft.fileupload.Resource;
-import zw.co.fasoft.utils.*;
+import zw.co.fasoft.fileupload.ResourceCategory;
 import zw.co.fasoft.utils.enums.Status;
 import zw.co.fasoft.utils.enums.UserGroup;
 
@@ -34,6 +34,9 @@ public class UserAccount extends BaseEntity {
     private Status status;
     @Enumerated(EnumType.STRING)
     private UserGroup userGroup;
+    @OneToMany
+    @JsonIgnore
+    private List<ResourceCategory> preferredCategories = new ArrayList<>();
     @JsonIgnore
     @OneToMany(mappedBy = "userAccount", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Resource> resources = new ArrayList<>();

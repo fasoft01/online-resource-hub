@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import zw.co.fasoft.embeddables.ContributorDetails;
-import zw.co.fasoft.utils.enums.ResourceCategory;
 
 /**
  * @author Fasoft

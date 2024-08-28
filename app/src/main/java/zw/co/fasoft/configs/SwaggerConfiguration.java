@@ -19,7 +19,7 @@ public class SwaggerConfiguration {
         License mitLicense = new License().name("MIT License").url("https://choosealicense.com/licenses/mit/");
 
         Info info = new Info()
-                .title("Fasoft Notification Service")
+                .title("Online Resource Hub API")
                 .version("1.0")
                 .contact(contact)
                 .description("Fasoft Notification Service").termsOfService("https://www.fasoft.co.zw/#/")

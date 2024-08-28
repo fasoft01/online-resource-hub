@@ -1,9 +1,7 @@
 package zw.co.fasoft.fileupload;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import zw.co.fasoft.base.BaseRepository;
-import zw.co.fasoft.utils.enums.ResourceCategory;
 
 import java.util.List;
 

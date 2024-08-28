@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/merchants/**",
                                 "/clients/**", "/initiate/**","/initiate-payment/**").permitAll()
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
                                 .jwtAuthenticationConverter(jwtAuthConverter)))
@@ -52,9 +52,9 @@ public class SecurityConfig {
         bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return bean;
     }
-    @Bean
-    public JwtDecoder jwtDecoder() {
-        // The issuer URI is used by JwtDecoder to fetch public keys and validate JWTs.
-        return JwtDecoders.fromIssuerLocation("http://44.196.149.62:8080/realms/InstalipaGateway");
-    }
+//    @Bean
+//    public JwtDecoder jwtDecoder() {
+//        // The issuer URI is used by JwtDecoder to fetch public keys and validate JWTs.
+//        return JwtDecoders.fromIssuerLocation("http://44.196.149.62:8080/realms/InstalipaGateway");
+//    }
     }

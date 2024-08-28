@@ -1,7 +1,6 @@
 package zw.co.fasoft.fileupload;
 
 import org.springframework.data.domain.Pageable;
-import zw.co.fasoft.utils.enums.ResourceCategory;
 
 import java.util.List;
 
