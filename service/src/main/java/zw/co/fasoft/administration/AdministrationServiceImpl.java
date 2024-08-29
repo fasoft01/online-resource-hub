@@ -137,6 +137,13 @@ public class AdministrationServiceImpl implements AdministrationService{
                 .map(this::createDTO);
     }
 
+    @Override
+    public UserAccount getUserProfile(String name) {
+        return userAccountRepository
+                .findByUsername(name)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
     private UserAccountResponse createDTO(UserAccount userAccount) {
         return UserAccountResponse.builder()
                 .fullName(userAccount.getFullName())

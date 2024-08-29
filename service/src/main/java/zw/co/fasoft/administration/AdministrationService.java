@@ -17,4 +17,6 @@ public interface AdministrationService {
 
 
     Page<UserAccountResponse> getAllUsers(String name, Status status, UserGroup role, Pageable pageable);
+
+    UserAccount getUserProfile(String name);
 }

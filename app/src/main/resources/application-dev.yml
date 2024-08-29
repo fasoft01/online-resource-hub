@@ -37,7 +37,7 @@ keycloak:
   realm-base-url: http://44.196.149.62:8080/admin/realms/InstalipaGateway
   masterUrl: http://44.196.149.62:8080/realms/master/protocol/openid-connect/token
   client-user-uri: http://44.196.149.62:8080/admin/realms/InstalipaGateway/users
-  client-uuid: 60cbfeb0-14a7-484c-863d-45ab7c370aee
+  client-uuid: 2a36dfb4-0912-4c35-b817-7d1926277644
 
 
 notifications:

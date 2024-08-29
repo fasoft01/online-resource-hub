@@ -54,6 +54,13 @@ public class AdministrationController {
             @RequestBody UpdateUserAccountRequest request){
         return ResponseEntity.ok(administrationService.updateUserProfile(principal.getName(),request));
     }
+
+    @GetMapping("/profile")
+    @Operation(description = "Gets User Profile")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserAccount> getUserProfile(Principal principal){
+        return ResponseEntity.ok(administrationService.getUserProfile(principal.getName()));
+    }
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(description = "Deletes User by ID")
