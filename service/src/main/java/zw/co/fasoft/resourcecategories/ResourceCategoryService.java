@@ -16,10 +16,11 @@ public interface ResourceCategoryService {
 
     ResourceCategory getResourceCategoryById(Long id);
 
+    ResourceCategory byId(Long id);
+
     Page<ResourceCategoryResponse> getAllResourceCategories(String name, Pageable pageable);
 
     List<ResourceCategoryResponse> getPreferredCategories(String name, Pageable pageable, String username);
 
     void addPreferredResourceCategory(Long resourceId, String name);
-
 }

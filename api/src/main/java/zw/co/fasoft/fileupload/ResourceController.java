@@ -35,7 +35,7 @@ public class ResourceController {
             @RequestBody List<ResourceRequest> request,
             Principal principal
     ) {
-        return ResponseEntity.ok(resourceService.create(request,username));
+        return ResponseEntity.ok(resourceService.create(request,principal.getName()));
     }
 
     @PutMapping("/approve/{resource-id}")

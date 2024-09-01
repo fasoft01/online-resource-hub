@@ -10,6 +10,7 @@ import zw.co.fasoft.NotificationServiceImpl;
 import zw.co.fasoft.embeddables.ContributorDetails;
 import zw.co.fasoft.exceptions.RecordNotFoundException;
 import zw.co.fasoft.resourcecategories.ResourceCategoryService;
+import zw.co.fasoft.resourcecategory.ResourceCategory;
 import zw.co.fasoft.useraccount.UserAccount;
 import zw.co.fasoft.useraccount.UserAccountRepository;
 import zw.co.fasoft.utils.Message;
@@ -44,7 +45,6 @@ public class ResourceServiceImpl implements ResourceService {
                             .studentOrtStaffId(documentRequest.getContributorDetails().getStudentOrtStaffId())
                             .build();
 
-                    if(documentRequest.)
                     Resource document = Resource.builder()
                             .title(documentRequest.getTitle())
                             .description(documentRequest.getDescription())
@@ -55,7 +55,18 @@ public class ResourceServiceImpl implements ResourceService {
                             .resourceCategory(null)
                             .uri(documentRequest.getUri())
                             .build();
-                        documents.add(document);
+
+                    if(documentRequest.getResourceCategoryIds() != null) {
+                        documentRequest.getResourceCategoryIds()
+                                .forEach(resourceCategoryId -> {
+                                    var resourceCategory = resourceCategoryService
+                                            .byId(resourceCategoryId);
+                                    if(Objects.nonNull(resourceCategory)) {
+                                        document.getResourceCategory().add(resourceCategory);
+                                    }
+                                });
+                    }
+                    documents.add(document);
                         sendNotification(documentRequest, userAccount);
                 });
         List<Resource> savedResources = resourceRepository.saveAllAndFlush(documents);

@@ -5,11 +5,10 @@ import org.springframework.data.domain.Pageable;
 import zw.co.fasoft.utils.enums.LikeType;
 
 public interface LikeService {
-    LikeResponse likeResource(LikeRequest like);
+
+    LikeResponse likeResource(LikeRequest likeRequest, String username);
 
     LikeResponse getResourceLikes(Long resourceId);
 
-    Page<Like> getUserLikes(String name, Pageable pageable);
-
-    Page<Like> getAllLikes(Pageable pageable, LikeType likeType);
+    Page<LikeResponse> getAllLikes(Pageable pageable);
 }

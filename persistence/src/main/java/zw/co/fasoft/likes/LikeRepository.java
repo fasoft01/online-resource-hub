@@ -9,4 +9,5 @@ import zw.co.fasoft.utils.enums.LikeType;
 @Repository
 public interface LikeRepository extends BaseRepository<Like, Long> {
     Boolean existsByResourceAndUserAndLikeType(Resource resource, UserAccount user, LikeType likeType);
+    Long countAllByResourceAndLikeType(Resource resource, LikeType likeType);
 }

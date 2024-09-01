@@ -58,6 +58,11 @@ public class ResourceCategoryServiceImpl implements ResourceCategoryService{
     }
 
     @Override
+    public ResourceCategory byId(Long id) {
+        return resourceCategoryRepository.findById(id)
+                .orElse(null);
+    }
+    @Override
     public Page<ResourceCategoryResponse> getAllResourceCategories(String name, Pageable pageable) {
         if(Objects.nonNull(name)){
             return resourceCategoryRepository.findAllByCategoryNameContainingIgnoreCase(name, pageable).map(this::getResourceCategoryResponse);

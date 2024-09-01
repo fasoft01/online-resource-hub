@@ -26,8 +26,10 @@ public class LikesController {
 
     @PostMapping
     @Operation(description = "Like or dislike a resource")
-    public ResponseEntity<LikeResponse> like(@RequestBody LikeRequest like) {
-        return ResponseEntity.ok(likesService.likeResource(like));
+    public ResponseEntity<LikeResponse> like(
+            @RequestBody LikeRequest like,
+            Principal principal) {
+        return ResponseEntity.ok(likesService.likeResource(like, principal.getName()));
     }
 
     @GetMapping("/{resource-id}")
@@ -36,23 +38,22 @@ public class LikesController {
         return ResponseEntity.ok(likesService.getResourceLikes(resourceId));
     }
 
-    @GetMapping("/profile")
-    @Operation(description = "Get all likes")
-    public ResponseEntity<Page<Like>> getUserLikes(
-            @RequestParam(required = false, defaultValue = "0") int pageNumber,
-            @RequestParam(required = false, defaultValue = "10") int pageSize,
-            Principal principal) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        return ResponseEntity.ok(likesService.getUserLikes(principal.getName(),pageable));
-    }
+//    @GetMapping("/profile")
+//    @Operation(description = "Get all likes")
+//    public ResponseEntity<Page<Like>> getUserLikes(
+//            @RequestParam(required = false, defaultValue = "0") int pageNumber,
+//            @RequestParam(required = false, defaultValue = "10") int pageSize,
+//            Principal principal) {
+//        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+//        return ResponseEntity.ok(likesService.getUserLikes(principal.getName(),pageable));
+//    }
 
     @GetMapping
-    public ResponseEntity<Page<Like>> getAllLikes(
-            @RequestParam(required = false) LikeType likeType,
+    public ResponseEntity<Page<LikeResponse>> getAllLikes(
             @RequestParam(required = false, defaultValue = "0") int pageNumber,
             @RequestParam(required = false, defaultValue = "10") int pageSize
     ) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        return ResponseEntity.ok(likesService.getAllLikes(pageable, likeType));
+        return ResponseEntity.ok(likesService.getAllLikes(pageable));
     }
 }
