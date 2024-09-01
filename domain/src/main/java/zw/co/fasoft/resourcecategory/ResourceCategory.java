@@ -1,8 +1,9 @@
-package zw.co.fasoft.fileupload;
+package zw.co.fasoft.resourcecategory;
 
 import jakarta.persistence.*;
 import lombok.*;
 import zw.co.fasoft.base.BaseEntity;
+import zw.co.fasoft.fileupload.Resource;
 import zw.co.fasoft.useraccount.UserAccount;
 
 import java.util.ArrayList;

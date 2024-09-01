@@ -2,6 +2,7 @@ package zw.co.fasoft.fileupload;
 
 import org.springframework.stereotype.Repository;
 import zw.co.fasoft.base.BaseRepository;
+import zw.co.fasoft.resourcecategory.ResourceCategory;
 
 import java.util.List;
 

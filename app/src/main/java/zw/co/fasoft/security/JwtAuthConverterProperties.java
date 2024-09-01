@@ -12,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @Configuration
 public class JwtAuthConverterProperties {
-    @Value("InstalipaGateway")
+    @Value("OnlineResourceHub")
     private String resourceId;
     @Value("preferred_username")
     private String principalAttribute;

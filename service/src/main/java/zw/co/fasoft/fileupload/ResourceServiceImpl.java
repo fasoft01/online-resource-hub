@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import zw.co.fasoft.NotificationServiceImpl;
 import zw.co.fasoft.embeddables.ContributorDetails;
 import zw.co.fasoft.exceptions.RecordNotFoundException;
+import zw.co.fasoft.resourcecategories.ResourceCategoryService;
 import zw.co.fasoft.useraccount.UserAccount;
 import zw.co.fasoft.useraccount.UserAccountRepository;
 import zw.co.fasoft.utils.Message;
@@ -25,11 +26,13 @@ public class ResourceServiceImpl implements ResourceService {
     private final ResourceRepository resourceRepository;
     private final NotificationServiceImpl notificationService;
     private final UserAccountRepository userAccountRepository;
+    private final ResourceCategoryService resourceCategoryService;
 
     @Override
     public List<Resource> create(List<ResourceRequest> request, String username) {
         var userAccount = userAccountRepository.findByUsername(username)
                 .orElseThrow(() -> new RecordNotFoundException("User not found"));
+
         Set<Resource> documents = new HashSet<>();
 
         request.stream()
@@ -40,6 +43,8 @@ public class ResourceServiceImpl implements ResourceService {
                             .email(documentRequest.getContributorDetails().getEmail())
                             .studentOrtStaffId(documentRequest.getContributorDetails().getStudentOrtStaffId())
                             .build();
+
+                    if(documentRequest.)
                     Resource document = Resource.builder()
                             .title(documentRequest.getTitle())
                             .description(documentRequest.getDescription())
@@ -141,6 +146,7 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public List<Resource> getAllResources(String contributorName, String title, String description, String keywords, Long categoryId, Pageable pageable) {
+        var resourceCategory = resourceCategoryService.getResourceCategoryById(categoryId);
         if(Objects.nonNull(title)) {
             return resourceRepository.findAllByTitleContainingIgnoreCase(title);
         }
@@ -150,9 +156,9 @@ public class ResourceServiceImpl implements ResourceService {
         if(Objects.nonNull(keywords)) {
             return resourceRepository.findAllByKeywordsContainingIgnoreCase(keywords);
         }
-//        if(Objects.nonNull(category)) {
-//            return resourceRepository.findAllByResourceCategory(category);
-//        }
+        if(Objects.nonNull(categoryId)) {
+            return resourceRepository.findAllByResourceCategory(resourceCategory);
+        }
         if(Objects.nonNull(contributorName)) {
             return resourceRepository.findAllByContributorDetails_NameContainingIgnoreCaseOrderByCreatedOnDesc(contributorName);
         }

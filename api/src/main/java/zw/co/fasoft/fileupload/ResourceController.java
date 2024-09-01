@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,19 +24,16 @@ import java.util.List;
 @RequestMapping(value = "/resources",produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Files & Resources", description = "files and resources")
 @SecurityRequirement(name = "authorization")
+@RequiredArgsConstructor
 public class ResourceController {
-    private final ResourceService resourceService;
-    @Autowired
-    public ResourceController(ResourceService resourceService) {
-        this.resourceService = resourceService;
-    }
+    public final ResourceService resourceService;
 
-    @PostMapping()
+    @PostMapping
     @Operation(description = "Save Resource")
-    @PreAuthorize("hasRole('ADMIN')")
-    private ResponseEntity<List<Resource>> create(
+    @PreAuthorize("hasAnyRole('ADMIN','STUDENT')")
+    public ResponseEntity<List<Resource>> create(
             @RequestBody List<ResourceRequest> request,
-            @RequestParam String username
+            Principal principal
     ) {
         return ResponseEntity.ok(resourceService.create(request,username));
     }
@@ -43,7 +41,7 @@ public class ResourceController {
     @PutMapping("/approve/{resource-id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(description = "Approve Resource")
-    private ResponseEntity<Resource> approve(
+    public ResponseEntity<Resource> approve(
             @PathVariable("resource-id") Long resourceId
     ) {
         return ResponseEntity.ok(resourceService.approve(resourceId));
@@ -52,7 +50,7 @@ public class ResourceController {
     @PutMapping("/reject/{resource-id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(description = "Reject Resource")
-    private ResponseEntity<Resource> reject(
+    public ResponseEntity<Resource> reject(
             @PathVariable("resource-id") Long resourceId,
             @RequestParam String reason
     ) {
@@ -95,7 +93,6 @@ public class ResourceController {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortBy));
         return ResponseEntity.ok(resourceService.searchForResources(searchParam,categoryId,pageable));
     }
-
     @GetMapping
     public ResponseEntity<List<Resource>> getAllResources
             (

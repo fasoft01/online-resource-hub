@@ -2,15 +2,17 @@ server:
   port: 8087
 
 spring:
+  application:
+    name: keycloak-auth-service
   datasource:
-    url: jdbc:mysql://54.211.210.11:3306/online_resource_hub
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root_nc
-    password: "rp2MBhxmM@"
+     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+     url: jdbc:sqlserver://52.4.172.195;instance=;DatabaseName=EpayDatabase2;trustServerCertificate=true;
+     username: sa
+     password: "%$Afro123"
   jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+      hibernate:
+        ddl-auto: update
+      show-sql: false
 
 
 
@@ -35,7 +37,7 @@ keycloak:
   admin-username: admin
   admin-password: admin
   realm-base-url: http://localhost:7080/realms/OnlineResourceHub
-  masterUrl: http://44.196.149.62:8080/realms/master/protocol/openid-connect/token
+  masterUrl: http://localhost:7080/realms/master/protocol/openid-connect/token
   client-user-uri: http://localhost:7080/realms/OnlineResourceHub/users
   client-uuid: 60cbfeb0-14a7-484c-863d-45ab7c370aee
 

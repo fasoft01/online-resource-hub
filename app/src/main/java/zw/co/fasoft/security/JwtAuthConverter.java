@@ -26,7 +26,7 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
 
 
     private final String principalAttribute = "preferred_username";
-    private final String resourceId = "InstalipaGateway";
+    private final String resourceId = "OnlineResourceHub";
 
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {

@@ -33,7 +33,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
-public class AdministrationServiceImpl implements AdministrationService{
+public class  AdministrationServiceImpl implements AdministrationService{
     private final UserAccountRepository userAccountRepository;
     private final CommonsService commonsService;
     private final KeycloakCommons keycloakCommons;
@@ -50,6 +50,7 @@ public class AdministrationServiceImpl implements AdministrationService{
                 .fullName(userAccount.getFullName())
                 .email(userAccount.getEmail())
                 .phoneNumber(userAccount.getPhoneNumber())
+                .username(userAccount.getUsername())
                 .role(userAccount.getUserGroup())
                 .build();
         saveKeycloakUser(postUserAccountRequest);
@@ -125,7 +126,6 @@ public class AdministrationServiceImpl implements AdministrationService{
                     .findAllByUserGroupOrderByCreatedOnDesc(role,pageable)
                     .map(this::createDTO);
         }
-
         if(Objects.nonNull(status)) {
             return userAccountRepository
                     .findAllByStatusOrderByCreatedOnDesc(status, pageable)
@@ -160,6 +160,7 @@ public class AdministrationServiceImpl implements AdministrationService{
   class PostUserAccountRequest {
     private String fullName;
     private String email;
+    private String username;
     private String phoneNumber;
     @Enumerated(EnumType.STRING)
     private UserGroup role;

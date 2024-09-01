@@ -5,12 +5,15 @@ import jakarta.persistence.*;
 import lombok.*;
 import zw.co.fasoft.base.BaseEntity;
 import zw.co.fasoft.fileupload.Resource;
-import zw.co.fasoft.fileupload.ResourceCategory;
+import zw.co.fasoft.resourcecategory.ResourceCategory;
+import zw.co.fasoft.likes.Like;
 import zw.co.fasoft.utils.enums.Status;
 import zw.co.fasoft.utils.enums.UserGroup;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Fasoft
@@ -37,6 +40,8 @@ public class UserAccount extends BaseEntity {
     @ManyToMany
     @JsonIgnore
     private List<ResourceCategory> preferredCategories = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<Like> likes = new HashSet<>();
     @JsonIgnore
     @OneToMany(mappedBy = "userAccount", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Resource> resources = new ArrayList<>();

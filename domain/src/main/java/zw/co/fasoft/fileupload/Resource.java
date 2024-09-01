@@ -4,11 +4,15 @@ import jakarta.persistence.*;
 import lombok.*;
 import zw.co.fasoft.base.BaseEntity;
 import zw.co.fasoft.embeddables.ContributorDetails;
+import zw.co.fasoft.likes.Like;
+import zw.co.fasoft.resourcecategory.ResourceCategory;
 import zw.co.fasoft.useraccount.UserAccount;
 import zw.co.fasoft.utils.enums.ResourceStatus;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Fasoft
@@ -36,6 +40,8 @@ public class Resource extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_account_id")
     private UserAccount userAccount;
+    @OneToMany(mappedBy = "resource", cascade = CascadeType.ALL)
+    private Set<Like> likes = new HashSet<>();
     @ManyToMany
     private List<ResourceCategory> resourceCategory = new ArrayList<>();
 }
