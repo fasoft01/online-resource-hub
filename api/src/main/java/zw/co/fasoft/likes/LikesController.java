@@ -22,7 +22,7 @@ import java.security.Principal;
 @Tag(name = "Resource Liking", description = "like and dislike resources")
 @SecurityRequirement(name = "authorization")
 public class LikesController {
-    public LikeService likesService;
+    public final LikeService likesService;
 
     @PostMapping
     @Operation(description = "Like or dislike a resource")
