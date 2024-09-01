@@ -32,6 +32,14 @@ public class LikesController {
         return ResponseEntity.ok(likesService.likeResource(like, principal.getName()));
     }
 
+    @DeleteMapping
+    @Operation(description = "Undo like")
+    public ResponseEntity<LikeResponse> undoLike(
+            @RequestParam Long resourceId,
+            Principal principal) {
+        return ResponseEntity.ok(likesService.undoLikeResource(resourceId, principal.getName()));
+    }
+
     @GetMapping("/{resource-id}")
     @Operation(description = "Get all likes for a resource")
     public ResponseEntity<LikeResponse> getResourceLikes(@PathVariable("resource-id") Long resourceId) {

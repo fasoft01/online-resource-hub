@@ -68,4 +68,13 @@ public class LikeServiceImpl implements LikeService {
                 .toList();
         return new PageImpl<>(likeResponses, pageable, likeResponses.size());
     }
+
+    @Override
+    public LikeResponse undoLikeResource(Long resourceId, String name) {
+        var resource = resourceService.getById(resourceId);
+        var userAccount = userAccountRepository.findByUsername(name)
+                .orElseThrow(() -> new RecordNotFoundException("User not found"));
+        likesRepository.deleteAllByUserAndResource(userAccount, resource);
+        return getLikeResponse(resource);
+    }
 }

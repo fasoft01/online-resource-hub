@@ -11,4 +11,6 @@ public interface LikeService {
     LikeResponse getResourceLikes(Long resourceId);
 
     Page<LikeResponse> getAllLikes(Pageable pageable);
+
+    LikeResponse undoLikeResource(Long resourceId, String name);
 }

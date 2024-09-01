@@ -3,6 +3,8 @@ package zw.co.fasoft.fileupload;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -126,20 +128,20 @@ public class ResourceServiceImpl implements ResourceService {
 
 
     @Override
-    public List<Resource> searchForResources(String searchParam, Long categoryId, Pageable pageable) {
-        if(!resourceRepository.findAllByTitleContainingIgnoreCase(searchParam).isEmpty()) {
-            return resourceRepository.findAllByTitleContainingIgnoreCase(searchParam);
+    public Page<Resource> searchForResources(String searchParam, Pageable pageable) {
+        if(!resourceRepository.findAllByTitleContainingIgnoreCase(searchParam,pageable).isEmpty()) {
+            return resourceRepository.findAllByTitleContainingIgnoreCase(searchParam,pageable);
         }
-        if(!resourceRepository.findAllByDescriptionContainingIgnoreCase(searchParam).isEmpty()) {
-            return resourceRepository.findAllByDescriptionContainingIgnoreCase(searchParam);
+        if(!resourceRepository.findAllByDescriptionContainingIgnoreCase(searchParam,pageable).isEmpty()) {
+            return resourceRepository.findAllByDescriptionContainingIgnoreCase(searchParam,pageable);
         }
-        if(!resourceRepository.findAllByKeywordsContainingIgnoreCase(searchParam).isEmpty()) {
-            return resourceRepository.findAllByKeywordsContainingIgnoreCase(searchParam);
+        if(!resourceRepository.findAllByKeywordsContainingIgnoreCase(searchParam,pageable).isEmpty()) {
+            return resourceRepository.findAllByKeywordsContainingIgnoreCase(searchParam,pageable);
         }
 //        if(!resourceRepository.findAllByContributorDetails_NameContainingIgnoreCaseOrderByCreatedOnDesc(searchParam).isEmpty()) {
 //            return resourceRepository.findAllByResourceCategory(categoryId);
 //        }
-        return new ArrayList<>();
+        return new PageImpl<>(new ArrayList<>());
     }
 
     @Override
@@ -156,24 +158,28 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public List<Resource> getAllResources(String contributorName, String title, String description, String keywords, Long categoryId, Pageable pageable) {
-        var resourceCategory = resourceCategoryService.getResourceCategoryById(categoryId);
+    public Page<Resource> getAllResources(String contributorName, String title, String description, String keywords, Long categoryId, Pageable pageable) {
+        ResourceCategory resourceCategory = null;
+        if(Objects.nonNull(categoryId)){
+            resourceCategory = resourceCategoryService.getResourceCategoryById(categoryId);
+        }
         if(Objects.nonNull(title)) {
-            return resourceRepository.findAllByTitleContainingIgnoreCase(title);
+            return resourceRepository.findAllByTitleContainingIgnoreCase(title,pageable);
         }
         if(Objects.nonNull(description)) {
-            return resourceRepository.findAllByDescriptionContainingIgnoreCase(description);
+            return resourceRepository.findAllByDescriptionContainingIgnoreCase(description,pageable);
         }
         if(Objects.nonNull(keywords)) {
-            return resourceRepository.findAllByKeywordsContainingIgnoreCase(keywords);
+            return resourceRepository.findAllByKeywordsContainingIgnoreCase(keywords,pageable);
         }
         if(Objects.nonNull(categoryId)) {
-            return resourceRepository.findAllByResourceCategory(resourceCategory);
+            assert resourceCategory != null;
+            return resourceRepository.findAllByResourceCategory(resourceCategory,pageable);
         }
         if(Objects.nonNull(contributorName)) {
-            return resourceRepository.findAllByContributorDetails_NameContainingIgnoreCaseOrderByCreatedOnDesc(contributorName);
+            return resourceRepository.findAllByContributorDetails_NameContainingIgnoreCase(contributorName,pageable);
         }
-        return resourceRepository.findAll();
+        return resourceRepository.findAll(pageable);
     }
 
     @Override
@@ -228,10 +234,52 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public List<Resource> getProfileResources(String username, Long categoryId) {
+    public Page<Resource> getProfileResources(String username, Pageable pageable) {
 //        if(Objects.nonNull(categoryId)) {
 //            return resourceRepository.findAllByUserAccount_UsernameAndResourceCategoryOrderByCreatedOnDesc(username,categoryId);
 //        }
-        return resourceRepository.findAllByUserAccount_UsernameOrderByCreatedOnDesc(username);
+        return resourceRepository.findAllByUserAccount_Username(username,pageable);
+    }
+
+    @Override
+    public Page<Resource> searchResourcesForStudent(String searchParam, Pageable pageable) {
+        if(!resourceRepository.findAllByTitleContainingIgnoreCaseAndStatus(searchParam,ResourceStatus.APPROVED,pageable).isEmpty()) {
+            return resourceRepository.findAllByTitleContainingIgnoreCaseAndStatus(searchParam,ResourceStatus.APPROVED,pageable);
+        }
+        if(!resourceRepository.findAllByDescriptionContainingIgnoreCaseAndStatus(searchParam,ResourceStatus.APPROVED,pageable).isEmpty()) {
+            return resourceRepository.findAllByDescriptionContainingIgnoreCaseAndStatus(searchParam,ResourceStatus.APPROVED,pageable);
+        }
+        if(!resourceRepository.findAllByKeywordsContainingIgnoreCaseAndStatus(searchParam,ResourceStatus.APPROVED,pageable).isEmpty()) {
+            return resourceRepository.findAllByKeywordsContainingIgnoreCaseAndStatus(searchParam,ResourceStatus.APPROVED,pageable);
+        }
+//        if(!resourceRepository.findAllByContributorDetails_NameContainingIgnoreCaseOrderByCreatedOnDesc(searchParam).isEmpty()) {
+//            return resourceRepository.findAllByResourceCategory(categoryId);
+//        }
+        return new PageImpl<>(new ArrayList<>());
+    }
+
+    @Override
+    public Page<Resource> getAllResourcesForStudent(String title, String description, String keywords, String contributorName, Long categoryId, Pageable pageable) {
+        ResourceCategory resourceCategory = null;
+        if(Objects.nonNull(categoryId)){
+            resourceCategory = resourceCategoryService.getResourceCategoryById(categoryId);
+        }
+        if(Objects.nonNull(title)) {
+            return resourceRepository.findAllByTitleContainingIgnoreCaseAndStatus(title,ResourceStatus.APPROVED,pageable);
+        }
+        if(Objects.nonNull(description)) {
+            return resourceRepository.findAllByDescriptionContainingIgnoreCaseAndStatus(description,ResourceStatus.APPROVED,pageable);
+        }
+        if(Objects.nonNull(keywords)) {
+            return resourceRepository.findAllByKeywordsContainingIgnoreCaseAndStatus(keywords,ResourceStatus.APPROVED,pageable);
+        }
+        if(Objects.nonNull(categoryId)) {
+            assert resourceCategory != null;
+            return resourceRepository.findAllByResourceCategoryAndStatus(resourceCategory,ResourceStatus.APPROVED,pageable);
+        }
+        if(Objects.nonNull(contributorName)) {
+            return resourceRepository.findAllByContributorDetails_NameContainingIgnoreCaseAndStatus(contributorName,ResourceStatus.APPROVED, pageable);
+        }
+        return resourceRepository.findAllByStatus(ResourceStatus.APPROVED,pageable);
     }
 }

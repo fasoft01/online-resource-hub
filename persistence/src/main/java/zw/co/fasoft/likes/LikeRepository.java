@@ -10,4 +10,5 @@ import zw.co.fasoft.utils.enums.LikeType;
 public interface LikeRepository extends BaseRepository<Like, Long> {
     Boolean existsByResourceAndUserAndLikeType(Resource resource, UserAccount user, LikeType likeType);
     Long countAllByResourceAndLikeType(Resource resource, LikeType likeType);
+    void deleteAllByUserAndResource(UserAccount user, Resource resource);
 }

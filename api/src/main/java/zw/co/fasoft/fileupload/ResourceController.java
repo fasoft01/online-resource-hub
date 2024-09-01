@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -59,12 +60,37 @@ public class ResourceController {
 
     @GetMapping("/profile")
     @Operation(description = "getting all resources created by logged in user")
-    public ResponseEntity<List<Resource>> getAllResources(
+    public ResponseEntity<Page<Resource>> getAllResources(
             Principal principal,
-            @RequestParam(value = "category", required = false) Long categoryId
-            ) {
-        return ResponseEntity.ok(resourceService.getProfileResources(principal.getName(),categoryId));
+    @RequestParam(required = false, defaultValue = "0") int pageNumber,
+    @RequestParam(required = false, defaultValue = "10") int pageSize,
+    @RequestParam(value = "sortBy", defaultValue = "createdOn") String sortBy,
+    @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir
+            ){
+        Sort.Direction direction = sortDir.equalsIgnoreCase(sortBy) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortBy));
+        return ResponseEntity.ok(resourceService.getProfileResources(principal.getName(),pageable));
     }
+
+    @GetMapping("/student")
+    @PreAuthorize("hasRole('STUDENT')")
+    @Operation(description = "getting all resources on student side")
+    public ResponseEntity<Page<Resource>> getAllResourcesForStudent(
+            @Nullable @RequestParam(required = false) String title,
+            @Nullable @RequestParam(required = false) String description,
+            @Nullable @RequestParam(required = false) String keywords,
+            @Nullable @RequestParam(required = false) String contributorName,
+            @Nullable @RequestParam(required = false)Long categoryId,
+            @RequestParam(required = false, defaultValue = "0") int pageNumber,
+            @RequestParam(required = false, defaultValue = "10") int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = "createdOn") String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir
+    ) {
+        Sort.Direction direction = sortDir.equalsIgnoreCase(sortBy) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortBy));
+        return ResponseEntity.ok(resourceService.getAllResourcesForStudent(title, description, keywords, contributorName, categoryId, pageable));
+    }
+
     @GetMapping("{id}")
     @Operation(description = "getting document by it's id number")
     public ResponseEntity<Resource> getById(@PathVariable Long id) {
@@ -80,10 +106,9 @@ public class ResourceController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Resource>> searchForResources
+    public ResponseEntity<Page<Resource>> searchForResources
             (
                     @Nullable @RequestParam(required = true) String searchParam,
-                    @Nullable @RequestParam(required = false)Long categoryId,
                     @RequestParam(required = false, defaultValue = "0") int pageNumber,
                     @RequestParam(required = false, defaultValue = "10") int pageSize,
                     @RequestParam(value = "sortBy", defaultValue = "createdOn") String sortBy,
@@ -91,10 +116,25 @@ public class ResourceController {
             ){
         Sort.Direction direction = sortDir.equalsIgnoreCase(sortBy) ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortBy));
-        return ResponseEntity.ok(resourceService.searchForResources(searchParam,categoryId,pageable));
+        return ResponseEntity.ok(resourceService.searchForResources(searchParam,pageable));
+    }
+
+    @GetMapping("/student/search")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<Page<Resource>> searchResourcesForStudent
+            (
+                    @Nullable @RequestParam(required = true) String searchParam,
+                    @RequestParam(required = false, defaultValue = "0") int pageNumber,
+                    @RequestParam(required = false, defaultValue = "10") int pageSize,
+                    @RequestParam(value = "sortBy", defaultValue = "createdOn") String sortBy,
+                    @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir
+            ){
+        Sort.Direction direction = sortDir.equalsIgnoreCase(sortBy) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortBy));
+        return ResponseEntity.ok(resourceService.searchResourcesForStudent(searchParam,pageable));
     }
     @GetMapping
-    public ResponseEntity<List<Resource>> getAllResources
+    public ResponseEntity<Page<Resource>> getAllResources
             (
                     @Nullable @RequestParam(required = false) String title,
                     @Nullable @RequestParam(required = false) String description,
