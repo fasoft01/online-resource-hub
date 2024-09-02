@@ -21,8 +21,9 @@ public class ResourceCategory extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String categoryName;
+    private Boolean isDeleted;
     @ManyToOne
     private UserAccount userAccount;
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<Resource> resources = new ArrayList<>();
 }

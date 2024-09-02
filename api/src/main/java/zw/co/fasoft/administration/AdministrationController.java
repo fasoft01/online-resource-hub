@@ -48,7 +48,7 @@ public class AdministrationController {
 
     @PutMapping("/user")
     @Operation(description = "User update Profile")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','STUDENT')")
     public ResponseEntity<UserAccount> updateUserAccount(
             Principal principal,
             @RequestBody UpdateUserAccountRequest request){
@@ -57,7 +57,7 @@ public class AdministrationController {
 
     @GetMapping("/profile")
     @Operation(description = "Gets User Profile")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','STUDENT')")
     public ResponseEntity<UserAccount> getUserProfile(Principal principal){
         return ResponseEntity.ok(administrationService.getUserProfile(principal.getName()));
     }

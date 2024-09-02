@@ -10,12 +10,8 @@ import zw.co.fasoft.utils.enums.UserGroup;
 
 public interface AdministrationService {
     UserAccount createUser(UserAccountRequest userAccountRequest);
-
     UserAccount updateUserProfile(String name,UpdateUserAccountRequest userAccountRequest);
-
     void deleteUser(Long id);
-
-
     Page<UserAccountResponse> getAllUsers(String name, Status status, UserGroup role, Pageable pageable);
 
     UserAccount getUserProfile(String name);

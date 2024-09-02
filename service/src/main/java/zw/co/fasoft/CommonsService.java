@@ -32,6 +32,7 @@ public class CommonsService {
                 .username(userAccountRequest.getUsername())
                 .email(userAccountRequest.getEmail())
                 .phoneNumber(userAccountRequest.getPhoneNumber())
+                .isDeleted(false)
                 .status(Status.ACTIVATED)
                 .userGroup(userAccountRequest.getRole())
                 .build();

@@ -33,6 +33,7 @@ public class UserAccount extends BaseEntity {
     private String username;
     private String email;
     private String phoneNumber;
+    private Boolean isDeleted;
     @Enumerated(EnumType.STRING)
     private Status status;
     @Enumerated(EnumType.STRING)

@@ -33,48 +33,63 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public List<Resource> create(List<ResourceRequest> request, String username) {
+        // Find user account by username or throw an exception if not found
         var userAccount = userAccountRepository.findByUsername(username)
                 .orElseThrow(() -> new RecordNotFoundException("User not found"));
 
+        // Use a HashSet to avoid duplicate resources
         Set<Resource> documents = new HashSet<>();
 
+        // Process each document request
         request.stream()
-                .filter(documentRequest -> !documentExists(documentRequest))
+                .filter(documentRequest -> !documentExists(documentRequest)) // Filter out existing documents
                 .forEach(documentRequest -> {
+                    // Create ContributorDetails from the request
                     ContributorDetails contributorDetails = ContributorDetails.builder()
                             .name(documentRequest.getContributorDetails().getName())
                             .email(documentRequest.getContributorDetails().getEmail())
                             .studentOrtStaffId(documentRequest.getContributorDetails().getStudentOrtStaffId())
                             .build();
 
+                    // Initialize Resource object with an empty list for resourceCategory
                     Resource document = Resource.builder()
                             .title(documentRequest.getTitle())
                             .description(documentRequest.getDescription())
                             .keywords(documentRequest.getKeywords())
                             .status(ResourceStatus.AWAITING_APPROVAL)
+                            .isDeleted(false)
                             .contributorDetails(contributorDetails)
                             .userAccount(userAccount)
-                            .resourceCategory(null)
+                            .resourceCategory(new ArrayList<>()) // Initialize as an empty list
                             .uri(documentRequest.getUri())
                             .build();
 
-                    if(documentRequest.getResourceCategoryIds() != null) {
+                    // Add resource categories if provided
+                    if (documentRequest.getResourceCategoryIds() != null) {
                         documentRequest.getResourceCategoryIds()
                                 .forEach(resourceCategoryId -> {
-                                    var resourceCategory = resourceCategoryService
-                                            .byId(resourceCategoryId);
-                                    if(Objects.nonNull(resourceCategory)) {
+                                    var resourceCategory = resourceCategoryService.byId(resourceCategoryId);
+                                    if (Objects.nonNull(resourceCategory)) {
                                         document.getResourceCategory().add(resourceCategory);
                                     }
                                 });
                     }
+
+                    // Add the document to the set of documents
                     documents.add(document);
-                        sendNotification(documentRequest, userAccount);
+
+                    // Send a notification after adding the document
+                    sendNotification(documentRequest, userAccount);
                 });
+
+        // Save all documents to the repository and flush
         List<Resource> savedResources = resourceRepository.saveAllAndFlush(documents);
+
+        // Notify admin if there are any saved resources
         if (!savedResources.isEmpty()) {
             notifyAdmin(savedResources.size());
         }
+
         return savedResources;
     }
 
@@ -92,7 +107,7 @@ public class ResourceServiceImpl implements ResourceService {
         log.info("Total number of documents created: {}", count);
 
         List<UserAccount> userAccounts = userAccountRepository
-                .findAllByUserGroupOrderByCreatedOnDesc(UserGroup.ADMIN,Pageable.unpaged()).getContent();
+                .findAllByUserGroupAndIsDeletedOrderByCreatedOnDesc(UserGroup.ADMIN,false,Pageable.unpaged()).getContent();
         userAccounts.forEach(userAccount -> {
             String content = Message.ADMIN_NEW_ACADEMIC_RESOURCE_MESSAGE.replace(
                     "{count}",
@@ -129,14 +144,14 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public Page<Resource> searchForResources(String searchParam, Pageable pageable) {
-        if(!resourceRepository.findAllByTitleContainingIgnoreCase(searchParam,pageable).isEmpty()) {
-            return resourceRepository.findAllByTitleContainingIgnoreCase(searchParam,pageable);
+        if(!resourceRepository.findAllByTitleContainingIgnoreCaseAndIsDeleted(searchParam,false,pageable).isEmpty()) {
+            return resourceRepository.findAllByTitleContainingIgnoreCaseAndIsDeleted(searchParam,false,pageable);
         }
-        if(!resourceRepository.findAllByDescriptionContainingIgnoreCase(searchParam,pageable).isEmpty()) {
-            return resourceRepository.findAllByDescriptionContainingIgnoreCase(searchParam,pageable);
+        if(!resourceRepository.findAllByDescriptionContainingIgnoreCaseAndIsDeleted(searchParam,false,pageable).isEmpty()) {
+            return resourceRepository.findAllByDescriptionContainingIgnoreCaseAndIsDeleted(searchParam,false,pageable);
         }
-        if(!resourceRepository.findAllByKeywordsContainingIgnoreCase(searchParam,pageable).isEmpty()) {
-            return resourceRepository.findAllByKeywordsContainingIgnoreCase(searchParam,pageable);
+        if(!resourceRepository.findAllByKeywordsContainingIgnoreCaseAndIsDeleted(searchParam,false,pageable).isEmpty()) {
+            return resourceRepository.findAllByKeywordsContainingIgnoreCaseAndIsDeleted(searchParam,false,pageable);
         }
 //        if(!resourceRepository.findAllByContributorDetails_NameContainingIgnoreCaseOrderByCreatedOnDesc(searchParam).isEmpty()) {
 //            return resourceRepository.findAllByResourceCategory(categoryId);
@@ -154,7 +169,8 @@ public class ResourceServiceImpl implements ResourceService {
     public void delete(Long id) {
         var document = resourceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
-        resourceRepository.delete(document);
+        document.setIsDeleted(true);
+        resourceRepository.save(document);
     }
 
     @Override
@@ -164,22 +180,22 @@ public class ResourceServiceImpl implements ResourceService {
             resourceCategory = resourceCategoryService.getResourceCategoryById(categoryId);
         }
         if(Objects.nonNull(title)) {
-            return resourceRepository.findAllByTitleContainingIgnoreCase(title,pageable);
+            return resourceRepository.findAllByTitleContainingIgnoreCaseAndIsDeleted(title,false,pageable);
         }
         if(Objects.nonNull(description)) {
-            return resourceRepository.findAllByDescriptionContainingIgnoreCase(description,pageable);
+            return resourceRepository.findAllByDescriptionContainingIgnoreCaseAndIsDeleted(description,false,pageable);
         }
         if(Objects.nonNull(keywords)) {
-            return resourceRepository.findAllByKeywordsContainingIgnoreCase(keywords,pageable);
+            return resourceRepository.findAllByKeywordsContainingIgnoreCaseAndIsDeleted(keywords,false,pageable);
         }
         if(Objects.nonNull(categoryId)) {
             assert resourceCategory != null;
-            return resourceRepository.findAllByResourceCategory(resourceCategory,pageable);
+            return resourceRepository.findAllByResourceCategoryAndIsDeleted(resourceCategory,false,pageable);
         }
         if(Objects.nonNull(contributorName)) {
-            return resourceRepository.findAllByContributorDetails_NameContainingIgnoreCase(contributorName,pageable);
+            return resourceRepository.findAllByContributorDetails_NameContainingIgnoreCaseAndIsDeleted(contributorName,false,pageable);
         }
-        return resourceRepository.findAll(pageable);
+        return resourceRepository.findAllByIsDeleted(false,pageable);
     }
 
     @Override
@@ -238,19 +254,19 @@ public class ResourceServiceImpl implements ResourceService {
 //        if(Objects.nonNull(categoryId)) {
 //            return resourceRepository.findAllByUserAccount_UsernameAndResourceCategoryOrderByCreatedOnDesc(username,categoryId);
 //        }
-        return resourceRepository.findAllByUserAccount_Username(username,pageable);
+        return resourceRepository.findAllByUserAccount_UsernameAndIsDeleted(username,false,pageable);
     }
 
     @Override
     public Page<Resource> searchResourcesForStudent(String searchParam, Pageable pageable) {
-        if(!resourceRepository.findAllByTitleContainingIgnoreCaseAndStatus(searchParam,ResourceStatus.APPROVED,pageable).isEmpty()) {
-            return resourceRepository.findAllByTitleContainingIgnoreCaseAndStatus(searchParam,ResourceStatus.APPROVED,pageable);
+        if(!resourceRepository.findAllByTitleContainingIgnoreCaseAndStatusAndIsDeleted(searchParam,ResourceStatus.APPROVED,false,pageable).isEmpty()) {
+            return resourceRepository.findAllByTitleContainingIgnoreCaseAndStatusAndIsDeleted(searchParam,ResourceStatus.APPROVED,false,pageable);
         }
-        if(!resourceRepository.findAllByDescriptionContainingIgnoreCaseAndStatus(searchParam,ResourceStatus.APPROVED,pageable).isEmpty()) {
-            return resourceRepository.findAllByDescriptionContainingIgnoreCaseAndStatus(searchParam,ResourceStatus.APPROVED,pageable);
+        if(!resourceRepository.findAllByDescriptionContainingIgnoreCaseAndStatusAndIsDeleted(searchParam,ResourceStatus.APPROVED,false,pageable).isEmpty()) {
+            return resourceRepository.findAllByDescriptionContainingIgnoreCaseAndStatusAndIsDeleted(searchParam,ResourceStatus.APPROVED,false,pageable);
         }
-        if(!resourceRepository.findAllByKeywordsContainingIgnoreCaseAndStatus(searchParam,ResourceStatus.APPROVED,pageable).isEmpty()) {
-            return resourceRepository.findAllByKeywordsContainingIgnoreCaseAndStatus(searchParam,ResourceStatus.APPROVED,pageable);
+        if(!resourceRepository.findAllByKeywordsContainingIgnoreCaseAndStatusAndIsDeleted(searchParam,ResourceStatus.APPROVED,false,pageable).isEmpty()) {
+            return resourceRepository.findAllByKeywordsContainingIgnoreCaseAndStatusAndIsDeleted(searchParam,ResourceStatus.APPROVED,false,pageable);
         }
 //        if(!resourceRepository.findAllByContributorDetails_NameContainingIgnoreCaseOrderByCreatedOnDesc(searchParam).isEmpty()) {
 //            return resourceRepository.findAllByResourceCategory(categoryId);
@@ -265,21 +281,21 @@ public class ResourceServiceImpl implements ResourceService {
             resourceCategory = resourceCategoryService.getResourceCategoryById(categoryId);
         }
         if(Objects.nonNull(title)) {
-            return resourceRepository.findAllByTitleContainingIgnoreCaseAndStatus(title,ResourceStatus.APPROVED,pageable);
+            return resourceRepository.findAllByTitleContainingIgnoreCaseAndStatusAndIsDeleted(title,ResourceStatus.APPROVED,false,pageable);
         }
         if(Objects.nonNull(description)) {
-            return resourceRepository.findAllByDescriptionContainingIgnoreCaseAndStatus(description,ResourceStatus.APPROVED,pageable);
+            return resourceRepository.findAllByDescriptionContainingIgnoreCaseAndStatusAndIsDeleted(description,ResourceStatus.APPROVED,false,pageable);
         }
         if(Objects.nonNull(keywords)) {
-            return resourceRepository.findAllByKeywordsContainingIgnoreCaseAndStatus(keywords,ResourceStatus.APPROVED,pageable);
+            return resourceRepository.findAllByKeywordsContainingIgnoreCaseAndStatusAndIsDeleted(keywords,ResourceStatus.APPROVED,false,pageable);
         }
         if(Objects.nonNull(categoryId)) {
             assert resourceCategory != null;
-            return resourceRepository.findAllByResourceCategoryAndStatus(resourceCategory,ResourceStatus.APPROVED,pageable);
+            return resourceRepository.findAllByResourceCategoryAndStatusAndIsDeleted(resourceCategory,ResourceStatus.APPROVED,false,pageable);
         }
         if(Objects.nonNull(contributorName)) {
-            return resourceRepository.findAllByContributorDetails_NameContainingIgnoreCaseAndStatus(contributorName,ResourceStatus.APPROVED, pageable);
+            return resourceRepository.findAllByContributorDetails_NameContainingIgnoreCaseAndStatusAndIsDeleted(contributorName,ResourceStatus.APPROVED,false, pageable);
         }
-        return resourceRepository.findAllByStatus(ResourceStatus.APPROVED,pageable);
+        return resourceRepository.findAllByStatusAndIsDeleted(ResourceStatus.APPROVED,false,pageable);
     }
 }

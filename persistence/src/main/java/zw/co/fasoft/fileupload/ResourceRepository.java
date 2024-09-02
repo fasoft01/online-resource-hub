@@ -13,22 +13,27 @@ import java.util.List;
 public interface ResourceRepository extends BaseRepository<Resource, Long> {
     List<Resource> deleteResourceById(Long id);
 
-    Page<Resource> findAllByTitleContainingIgnoreCase(String title, Pageable pageable);
-    Page<Resource> findAllByTitleContainingIgnoreCaseAndStatus(String title, ResourceStatus approved, Pageable pageable);
-    Page<Resource> findAllByContributorDetails_NameContainingIgnoreCase(String name,Pageable pageable);
+    Page<Resource> findAllByTitleContainingIgnoreCaseAndIsDeleted(String title,Boolean isDeleted, Pageable pageable);
+    Page<Resource> findAllByTitleContainingIgnoreCaseAndStatusAndIsDeleted(String title, ResourceStatus approved,Boolean isDeleted ,Pageable pageable);
+    Page<Resource> findAllByContributorDetails_NameContainingIgnoreCaseAndIsDeleted(String name,Boolean isDeleted,Pageable pageable);
     List<Resource> findAllByUserAccount_UsernameAndResourceCategoryOrderByCreatedOnDesc(String username, ResourceCategory resourceCategory);
-    Page<Resource> findAllByUserAccount_Username(String username,Pageable pageable);
-    Page<Resource> findAllByKeywordsContainingIgnoreCase(String keywords,Pageable pageable);
-    Page<Resource> findAllByDescriptionContainingIgnoreCase(String description,Pageable pageable);
-    Page<Resource> findAllByDescriptionContainingIgnoreCaseAndStatus(String description, ResourceStatus approved, Pageable pageable);
+    Page<Resource> findAllByUserAccount_UsernameAndIsDeleted(String username,Boolean isDeleted,Pageable pageable);
+    Page<Resource> findAllByKeywordsContainingIgnoreCaseAndIsDeleted(String keywords,Boolean isDeleted,Pageable pageable);
+    Page<Resource> findAllByDescriptionContainingIgnoreCaseAndIsDeleted(String description,Boolean isDeleted,Pageable pageable);
+    Page<Resource> findAllByDescriptionContainingIgnoreCaseAndStatusAndIsDeleted(String description, ResourceStatus approved, Boolean isDeleted, Pageable pageable);
     Page<Resource> findAllByResourceCategory(ResourceCategory resourceCategory,Pageable pageable);
     boolean existsByTitle(String name);
 
-    Page<Resource> findAllByKeywordsContainingIgnoreCaseAndStatus(String keywords, ResourceStatus approved, Pageable pageable);
+    Page<Resource> findAllByKeywordsContainingIgnoreCaseAndStatusAndIsDeleted(String keywords, ResourceStatus approved,Boolean isDeleted, Pageable pageable);
 
-    Page<Resource> findAllByResourceCategoryAndStatus(ResourceCategory resourceCategory,ResourceStatus resourceStatus, Pageable pageable);
+    Page<Resource> findAllByResourceCategoryAndStatusAndIsDeleted(ResourceCategory resourceCategory,ResourceStatus resourceStatus, Boolean isDeleted, Pageable pageable);
 
-    Page<Resource> findAllByContributorDetails_NameContainingIgnoreCaseAndStatus( String contributorName,ResourceStatus approved, Pageable pageable);
+    Page<Resource> findAllByContributorDetails_NameContainingIgnoreCaseAndStatusAndIsDeleted( String contributorName,ResourceStatus approved,Boolean isDeleted, Pageable pageable);
 
-    Page<Resource> findAllByStatus(ResourceStatus resourceStatus, Pageable pageable);
+    Page<Resource> findAllByStatusAndIsDeleted(ResourceStatus resourceStatus,Boolean isDeleted, Pageable pageable);
+
+    Page<Resource> findAllByResourceCategoryAndIsDeleted(ResourceCategory resourceCategory,Boolean isDeleted, Pageable pageable);
+
+    Page<Resource> findAllByIsDeleted(Boolean isDeleted,Pageable pageable);
+    List<Resource> findAllByIsDeleted(Boolean isDeleted);
 }

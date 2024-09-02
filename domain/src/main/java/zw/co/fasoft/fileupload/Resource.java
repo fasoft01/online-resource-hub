@@ -30,17 +30,19 @@ public class Resource extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
+    @Column(length = 10000)
     private String description;
     @Embedded
     private ContributorDetails contributorDetails;
     private String keywords;
     @Enumerated(EnumType.STRING)
     private ResourceStatus status;
+    private Boolean isDeleted;
     private String uri;
     @ManyToOne
     @JoinColumn(name = "user_account_id")
     private UserAccount userAccount;
-    @OneToMany(mappedBy = "resource", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "resource", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Like> likes = new HashSet<>();
     @ManyToMany
     private List<ResourceCategory> resourceCategory = new ArrayList<>();

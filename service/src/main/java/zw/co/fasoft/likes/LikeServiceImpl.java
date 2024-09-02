@@ -30,6 +30,7 @@ public class LikeServiceImpl implements LikeService {
 
     @Override
     public LikeResponse likeResource(LikeRequest likeRequest,String username) {
+        log.info("Liking document : {}", likeRequest);
         var userAccount = userAccountRepository.findByUsername(username)
                 .orElseThrow(() -> new RecordNotFoundException("User not found"));
         var resource = resourceService.getById(likeRequest.getResourceId());
@@ -37,6 +38,7 @@ public class LikeServiceImpl implements LikeService {
         var like = Like.builder()
                 .likeType(likeRequest.getLikeType())
                 .user(userAccount)
+                .isDeleted(false)
                 .resource(resource)
                 .build();
         likesRepository.save(like);
@@ -44,10 +46,11 @@ public class LikeServiceImpl implements LikeService {
     }
 
     private LikeResponse getLikeResponse(Resource resource) {
-        Long LikesCount = likesRepository.countAllByResourceAndLikeType(resource, LikeType.LIKE);
-        Long DislikesCount = likesRepository.countAllByResourceAndLikeType(resource, LikeType.DISLIKE);
+        Long LikesCount = likesRepository.countAllByResourceAndLikeTypeAndIsDeleted(resource, LikeType.LIKE,false);
+        Long DislikesCount = likesRepository.countAllByResourceAndLikeTypeAndIsDeleted(resource,LikeType.DISLIKE,false);
 
         return LikeResponse.builder()
+                .id(resource.getId())
                 .resourceTitle(resource.getTitle())
                 .totalLikes(LikesCount)
                 .totalDislikes(DislikesCount)
@@ -61,7 +64,7 @@ public class LikeServiceImpl implements LikeService {
     }
     @Override
     public Page<LikeResponse> getAllLikes(Pageable pageable) {
-        List<Resource> resourceList = resourceRepository.findAll();
+        List<Resource> resourceList = resourceRepository.findAllByIsDeleted(false);
 
         List<LikeResponse> likeResponses = resourceList.stream()
                 .map(this::getLikeResponse)
@@ -74,7 +77,12 @@ public class LikeServiceImpl implements LikeService {
         var resource = resourceService.getById(resourceId);
         var userAccount = userAccountRepository.findByUsername(name)
                 .orElseThrow(() -> new RecordNotFoundException("User not found"));
-        likesRepository.deleteAllByUserAndResource(userAccount, resource);
+//        likesRepository.deleteAllByUserAndResource(userAccount, resource);
+        List<Like> likes = likesRepository.findAllByUserAndResourceAndIsDeleted(userAccount, resource, false);
+        likes.forEach(like -> {
+            like.setIsDeleted(true);
+        });
+        likesRepository.saveAll(likes);
         return getLikeResponse(resource);
     }
 }

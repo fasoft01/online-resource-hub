@@ -13,11 +13,11 @@ import java.util.Optional;
 @Repository
 public interface UserAccountRepository extends JpaRepository<UserAccount,Long> {
     Optional<UserAccount> findUserAccountByEmail(String email);
-    Page<UserAccount> findAllByFullNameContainingIgnoreCaseOrderByCreatedOnDesc(String name, Pageable pageable);
-    Page<UserAccount> findAllByStatusOrderByCreatedOnDesc(Status status, Pageable pageable);
+    Page<UserAccount> findAllByFullNameContainingIgnoreCaseAndIsDeletedOrderByCreatedOnDesc(String name,Boolean isDeleted, Pageable pageable);
+    Page<UserAccount> findAllByStatusAndIsDeletedOrderByCreatedOnDesc(Status status,Boolean isDeleted, Pageable pageable);
     Page<UserAccount> findAllByUsernameContainingIgnoreCase(String username, Pageable pageable);
 
     Optional<UserAccount> findByUsername(String username);
-    Page<UserAccount> findAll(Pageable pageable);
-    Page<UserAccount> findAllByUserGroupOrderByCreatedOnDesc(UserGroup userGroup, Pageable pageable);
+    Page<UserAccount> findAllByIsDeleted(Boolean isDeleted, Pageable pageable);
+    Page<UserAccount> findAllByUserGroupAndIsDeletedOrderByCreatedOnDesc(UserGroup userGroup,Boolean isDeleted, Pageable pageable);
 }

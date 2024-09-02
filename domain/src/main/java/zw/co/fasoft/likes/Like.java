@@ -22,6 +22,7 @@ public class Like {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserAccount user;
+    private Boolean isDeleted;
     @ManyToOne
     @JoinColumn(name = "resource_id")
     private Resource resource;

@@ -6,7 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import zw.co.fasoft.exceptions.RecordNotFoundException;
+import zw.co.fasoft.fileupload.Resource;
+import zw.co.fasoft.fileupload.ResourceRepository;
 import zw.co.fasoft.resourcecategory.ResourceCategory;
 import zw.co.fasoft.resourcecategory.ResourceCategoryRequest;
 import zw.co.fasoft.useraccount.UserAccountRepository;
@@ -23,10 +26,12 @@ public class ResourceCategoryServiceImpl implements ResourceCategoryService{
 
     private final ResourceCategoriesRepository resourceCategoryRepository;
     private final UserAccountRepository userAccountRepository;
+    private final ResourceRepository resourceRepository;
     @Override
     public ResourceCategoryResponse createResourceCategory(ResourceCategoryRequest request) {
         var resourceCategory = ResourceCategory.builder()
                 .categoryName(request.getCategoryName())
+                .isDeleted(false)
                 .build();
         return getResourceCategoryResponse(resourceCategoryRepository.save(resourceCategory));
     }
@@ -45,11 +50,19 @@ public class ResourceCategoryServiceImpl implements ResourceCategoryService{
         return getResourceCategoryResponse(resourceCategoryRepository.save(resourceCategory));
     }
 
+    @Transactional
     @Override
-    public void deleteResourceCategory(Long id) {
-        var resourceCategory = getResourceCategoryById(id);
-        resourceCategoryRepository.delete(resourceCategory);
+    public void deleteResourceCategory(Long categoryId) {
+        // Find the category
+        ResourceCategory category = resourceCategoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RecordNotFoundException("Resource Category not found"));
+
+        // Set the isDeleted flag to true
+        category.setIsDeleted(true);
+
+        resourceCategoryRepository.save(category);
     }
+
 
     @Override
     public ResourceCategory getResourceCategoryById(Long id) {
@@ -65,9 +78,9 @@ public class ResourceCategoryServiceImpl implements ResourceCategoryService{
     @Override
     public Page<ResourceCategoryResponse> getAllResourceCategories(String name, Pageable pageable) {
         if(Objects.nonNull(name)){
-            return resourceCategoryRepository.findAllByCategoryNameContainingIgnoreCase(name, pageable).map(this::getResourceCategoryResponse);
+            return resourceCategoryRepository.findAllByCategoryNameContainingIgnoreCaseAndIsDeleted(name,false, pageable).map(this::getResourceCategoryResponse);
         }
-        return resourceCategoryRepository.findAll(pageable).map(this::getResourceCategoryResponse);
+        return resourceCategoryRepository.findAllByIsDeleted(false,pageable).map(this::getResourceCategoryResponse);
     }
 
 

@@ -18,6 +18,7 @@ import zw.co.fasoft.CommonsService;
 import zw.co.fasoft.NotificationServiceImpl;
 import zw.co.fasoft.auth.KeycloakCommons;
 import zw.co.fasoft.auth.LoginResponse;
+import zw.co.fasoft.exceptions.EmailAlreadyExistsException;
 import zw.co.fasoft.exceptions.IncorrectUsernameOrPasswordException;
 import zw.co.fasoft.requests.UserAccountRequest;
 import zw.co.fasoft.responses.UserAccountResponse;
@@ -44,6 +45,9 @@ public class  AdministrationServiceImpl implements AdministrationService{
     private String authServiceUrl;
     @Override
     public UserAccount createUser(UserAccountRequest userAccountRequest) {
+        if(!userAccountRepository.findByUsername(userAccountRequest.getUsername()).isEmpty()) {
+            throw new EmailAlreadyExistsException("Username already exists");
+        }
         var userAccount = commonsService.saveUser(userAccountRequest);
 
         PostUserAccountRequest postUserAccountRequest = PostUserAccountRequest.builder()
@@ -111,29 +115,30 @@ public class  AdministrationServiceImpl implements AdministrationService{
     public void deleteUser(Long id) {
         var userAccount = userAccountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-         userAccountRepository.delete(userAccount);
+        userAccount.setIsDeleted(true);
+         userAccountRepository.save(userAccount);
     }
 
     @Override
     public Page<UserAccountResponse> getAllUsers(String name, Status status, UserGroup role, Pageable pageable) {
         if(Objects.nonNull(name)){
             return userAccountRepository
-                    .findAllByFullNameContainingIgnoreCaseOrderByCreatedOnDesc(name,pageable)
+                    .findAllByFullNameContainingIgnoreCaseAndIsDeletedOrderByCreatedOnDesc(name,false,pageable)
                     .map(this::createDTO);
         }
         if(Objects.nonNull(role)){
             return userAccountRepository
-                    .findAllByUserGroupOrderByCreatedOnDesc(role,pageable)
+                    .findAllByUserGroupAndIsDeletedOrderByCreatedOnDesc(role,false,pageable)
                     .map(this::createDTO);
         }
         if(Objects.nonNull(status)) {
             return userAccountRepository
-                    .findAllByStatusOrderByCreatedOnDesc(status, pageable)
+                    .findAllByStatusAndIsDeletedOrderByCreatedOnDesc(status, false,pageable)
                     .map(this::createDTO);
         }
 
         return userAccountRepository
-                .findAll(pageable)
+                .findAllByIsDeleted(false,pageable)
                 .map(this::createDTO);
     }
 
