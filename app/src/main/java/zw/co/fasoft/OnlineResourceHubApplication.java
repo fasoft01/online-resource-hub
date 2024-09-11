@@ -31,7 +31,6 @@ import java.util.Optional;
         bearerFormat = "JWT",
         in = SecuritySchemeIn.HEADER)
 public class OnlineResourceHubApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(OnlineResourceHubApplication.class, args);
     }
