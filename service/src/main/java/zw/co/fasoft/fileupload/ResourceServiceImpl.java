@@ -219,18 +219,26 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Async
     public void notifyEveryone(Resource resource) {
+        Boolean prefersNotifications = false;
         String subject = "New Academic Resource Available on TCFL Online Resource Hub!";
         List<UserAccount> userAccounts = userAccountRepository.findAll();
         userAccounts.forEach(userAccount -> {
-            notificationService.sendNotification(Message.NEW_APPROVED_RESOURCE_MESSAGE
-                    .replace("{title}", resource.getTitle())
-                    .replace("{description}", resource.getDescription())
-                    .replace("{resource-link}", resource.getUri())
-                    .replace("{contributor-name}", resource.getKeywords()),
-                    subject, resource.getContributorDetails().getName(),
-                    userAccount, true, false, false);
-        });
-    }
+                    for (var resourceCategory : resource.getResourceCategory()) {
+                        if (!userAccount.getPreferredCategories().isEmpty() && userAccount.getPreferredCategories().contains(resourceCategory)) {
+                            notificationService.sendNotification(Message.NEW_APPROVED_RESOURCE_MESSAGE
+                                            .replace("{title}", resource.getTitle())
+                                            .replace("{description}", resource.getDescription())
+                                            .replace("{resource-link}", resource.getUri())
+                                            .replace("{contributor-name}", resource.getKeywords()),
+                                    subject, resource.getContributorDetails().getName(),
+                                    userAccount, true, false, false);
+                            break;
+                        }
+                    }
+                    });
+               }
+
+
 
     @Override
     public Resource reject(Long resourceId, String reason) {
@@ -271,7 +279,7 @@ public class ResourceServiceImpl implements ResourceService {
 //        if(!resourceRepository.findAllByContributorDetails_NameContainingIgnoreCaseOrderByCreatedOnDesc(searchParam).isEmpty()) {
 //            return resourceRepository.findAllByResourceCategory(categoryId);
 //        }
-        return new PageImpl<>(new ArrayList<>());
+        return new PageImpl<>(new ArrayList<Resource>());
     }
 
     @Override
