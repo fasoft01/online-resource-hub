@@ -36,6 +36,7 @@ public class OnlineResourceHubApplication {
     }
 
 
+
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder.build();
