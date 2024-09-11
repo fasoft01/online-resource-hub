@@ -36,6 +36,7 @@ public class OnlineResourceHubApplication {
         SpringApplication.run(OnlineResourceHubApplication.class, args);
     }
 
+
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder.build();
