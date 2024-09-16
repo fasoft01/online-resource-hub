@@ -1,7 +1,6 @@
 pipeline {
     agent any
     tools {
-        // Specify the name of the Maven installation configured in Jenkins
         maven 'MAVEN'
     }
     stages {
