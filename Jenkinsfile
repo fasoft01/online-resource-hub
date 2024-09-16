@@ -12,7 +12,7 @@ pipeline {
         }
         stage("Build Code") {
             steps {
-                bat 'mvn clean install'
+                sh 'mvn clean install'
             }
         }
         stage("Copy JAR and Restart Application") {
@@ -21,9 +21,9 @@ pipeline {
                     def jarFile = 'app/target/online-resource-hub.jar'
                     def destinationDir = '/data/jars'
 
-                    bat "cp ${jarFile} ${destinationDir}/"
+                    sh "cp ${jarFile} ${destinationDir}/"
 
-                    bat 'sudo systemctl restart online-resource-hub.service'
+                    sh 'sudo systemctl restart online-resource-hub.service'
                 }
             }
         }
