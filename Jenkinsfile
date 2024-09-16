@@ -21,7 +21,7 @@ pipeline {
                     def jarFile = 'app/target/online-resource-hub.jar'
                     def destinationDir = '/data/jars'
 
-                    sh "cp ${jarFile} ${destinationDir}/"
+                    sh "sudo cp ${jarFile} ${destinationDir}/"
 
                     sh 'sudo systemctl restart online-resource-hub.service'
                 }
