@@ -1,23 +1,31 @@
 pipeline {
-  agent any
-     tools {
+    agent any
+    tools {
         maven 'MAVEN'
     }
-  stages{
-    stage('Install Dependencies'){
-      steps{
-        bat 'mvn clean install'
-      }
+    stages {
+        stage("Clone Code") {
+            steps {
+                git branch: 'main', credentialsId: 'fasoft-git credentials', url: 'https://github.com/fasoft01/online-resource-hub.git'
+            }
+        }
+        stage("Build Code") {
+            steps {
+                sh 'mvn clean install'
+            }
+        }
+        stage("Copy JAR and Restart Application") {
+            steps {
+                script {
+                    def jarFile = 'app/target/online-resource-hub.jar'
+                    def destinationDir = '/data/jars'
+
+                    sh "sudo cp ${jarFile} ${destinationDir}/"
+
+
+                    sh 'sudo systemctl restart online-resource-hub.service'
+                }
+            }
+        }
     }
-    stage('test'){
-      steps{
-        bat 'echo "testing application...."'
-      }
-    }
-    stage('Deploy apps'){
-      steps{
-        bat 'echo "deploying app..."'
-      }
-    }
-  }
 }
