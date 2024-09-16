@@ -23,6 +23,7 @@ pipeline {
 
                     sh "sudo cp ${jarFile} ${destinationDir}/"
 
+
                     sh 'sudo systemctl restart online-resource-hub.service'
                 }
             }
