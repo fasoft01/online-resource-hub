@@ -56,6 +56,7 @@ public class OnlineResourceHubApplication {
             } else if (principal instanceof Jwt) {
                 Jwt jwt = (Jwt) principal;
 
+
                 return Optional.of(jwt.getClaimAsString("preferred_username"));
             } else if (principal instanceof String) {
                 return Optional.of((String) principal);
