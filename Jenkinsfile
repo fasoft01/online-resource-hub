@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage("Clone Code") {
             steps {
-                git branch: 'main', credentialsId: 'fasoft-git credentials', url: 'https://github.com/fasoft01/online-resource-hub.git'
+                git branch: 'main', credentialsId: 'fasoft_gihub_credentials' url: 'enter-your-repository-url'
             }
         }
         stage("Build Code") {
@@ -22,8 +22,7 @@ pipeline {
 
                     sh "sudo cp ${jarFile} ${destinationDir}/"
 
-
-                    sh 'sudo systemctl restart online-resource-hub.service'
+                    sh 'sudo systemctl restart online-resource-hub.jar'
                 }
             }
         }
